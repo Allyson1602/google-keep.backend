@@ -14,17 +14,17 @@ export class ListingsService {
   ) {}
 
   create(createListingDto: CreateListingDto): Promise<Listing> {
-    const newListing: Listing = new Listing();
-    newListing.title = createListingDto.title;
+    const listing: Listing = new Listing();
+    listing.title = createListingDto.title;
 
     const tasks: Task[] = createListingDto.tasks.map((task) => ({
       ...task,
-      listing: newListing,
+      listing: listing,
     }));
 
-    newListing.tasks = tasks;
+    listing.tasks = tasks;
 
-    return this.listingRepository.save(newListing);
+    return this.listingRepository.save(listing);
   }
 
   findAll() {
@@ -32,27 +32,33 @@ export class ListingsService {
   }
 
   async update(id: number, updateListingDto: UpdateListingDto) {
-    const updateListing = await this.listingRepository.findOne({
+    const listing = await this.listingRepository.findOne({
       where: { id },
     });
 
-    if (!updateListing) {
+    if (!listing) {
       throw new NotFoundException('Checklist não encontrada');
     }
 
-    updateListing.title = updateListingDto.title;
+    listing.title = updateListingDto.title;
 
     const tasks: Task[] = updateListingDto.tasks.map((task) => ({
       ...task,
-      listing: updateListing,
+      listing: listing,
     }));
 
-    updateListing.tasks = tasks;
+    listing.tasks = tasks;
 
-    return await this.listingRepository.save(updateListing);
+    return await this.listingRepository.save(listing);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} listing`;
+  async remove(id: number): Promise<boolean> {
+    const result = await this.listingRepository.delete(id);
+
+    if (result.affected < 1) {
+      throw new NotFoundException('Checklist não encontrada');
+    }
+
+    return result.affected >= 1 ? true : false;
   }
 }
