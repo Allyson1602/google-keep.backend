@@ -9,6 +9,6 @@ export class Listing {
   @Column({ type: 'varchar', length: 60 })
   title: string;
 
-  @OneToMany(() => Task, (task) => task.listing_id)
+  @OneToMany(() => Task, (task) => task.listing)
   tasks: Task[];
 }

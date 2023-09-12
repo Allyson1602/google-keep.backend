@@ -7,7 +7,7 @@ export class Task {
   id: number;
 
   @ManyToOne(() => Listing, (listing) => listing.tasks)
-  listing_id: Listing;
+  listing: Listing;
 
   @Column({ type: 'varchar', length: 100 })
   description: string;

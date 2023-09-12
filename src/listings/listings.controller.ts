@@ -25,11 +25,6 @@ export class ListingsController {
     return this.listingsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.listingsService.findOne(+id);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateListingDto: UpdateListingDto) {
     return this.listingsService.update(+id, updateListingDto);
