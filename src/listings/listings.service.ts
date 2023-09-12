@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,8 +31,25 @@ export class ListingsService {
     return `This action returns all listings`;
   }
 
-  update(id: number, updateListingDto: UpdateListingDto) {
-    return `This action updates a #${id} listing`;
+  async update(id: number, updateListingDto: UpdateListingDto) {
+    const updateListing = await this.listingRepository.findOne({
+      where: { id },
+    });
+
+    if (!updateListing) {
+      throw new NotFoundException('Checklist não encontrada');
+    }
+
+    updateListing.title = updateListingDto.title;
+
+    const tasks: Task[] = updateListingDto.tasks.map((task) => ({
+      ...task,
+      listing: updateListing,
+    }));
+
+    updateListing.tasks = tasks;
+
+    return await this.listingRepository.save(updateListing);
   }
 
   remove(id: number) {
