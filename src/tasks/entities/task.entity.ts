@@ -1,13 +1,13 @@
+import { Listing } from 'src/listings/entities/listing.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Listing } from './listing.entity';
 
 @Entity()
 export class Task {
-  @PrimaryColumn({ type: 'int' })
+  @PrimaryColumn()
   id: number;
 
   @ManyToOne(() => Listing, (listing) => listing.tasks)
-  listing: Listing;
+  listing_id: number;
 
   @Column({ type: 'varchar', length: 100 })
   description: string;

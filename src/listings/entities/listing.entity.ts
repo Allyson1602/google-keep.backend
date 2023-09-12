@@ -1,5 +1,5 @@
+import { Task } from 'src/tasks/entities/task.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Task } from './task.entity';
 
 @Entity()
 export class Listing {
@@ -9,6 +9,6 @@ export class Listing {
   @Column({ type: 'varchar', length: 60 })
   title: string;
 
-  @OneToMany(() => Task, (task) => task.listing)
+  @OneToMany(() => Task, (task) => task.listing_id)
   tasks: Task[];
 }

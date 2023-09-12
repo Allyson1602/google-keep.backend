@@ -1,4 +1,6 @@
 import { DataSourceOptions } from 'typeorm';
+import { Listing } from './listings/entities/listing.entity';
+import { Task } from './tasks/entities/task.entity';
 
 export const DataSource: DataSourceOptions = {
   type: 'postgres',
@@ -7,6 +9,6 @@ export const DataSource: DataSourceOptions = {
   username: 'postgres',
   password: '12334',
   database: 'google_keep',
-  entities: [],
+  entities: [Listing, Task],
   synchronize: true,
 };

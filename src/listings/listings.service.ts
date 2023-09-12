@@ -1,34 +1,43 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Listing } from './entities/listing.entity';
 import { Repository } from 'typeorm';
-import { Task } from './entities/task.entity';
+import { Task } from 'src/tasks/entities/task.entity';
+import { TasksService } from 'src/tasks/tasks.service';
 
 @Injectable()
 export class ListingsService {
   constructor(
     @InjectRepository(Listing)
     private readonly listingRepository: Repository<Listing>,
+    @Inject(TasksService)
+    private readonly tasksService: TasksService,
   ) {}
 
-  create(createListingDto: CreateListingDto): Promise<Listing> {
+  async create(createListingDto: CreateListingDto): Promise<Listing> {
     const listing: Listing = new Listing();
     listing.title = createListingDto.title;
 
-    const tasks: Task[] = createListingDto.tasks.map((task) => ({
-      ...task,
-      listing: listing,
-    }));
+    const newListing = await this.listingRepository.save(listing);
 
-    listing.tasks = tasks;
+    // const tasks = await createListingDto.tasks.map((task) => {
+    //   return this.taskRepository.save({
+    //     ...task,
+    //     listing_id: newListing.id,
+    //   });
+    // });
 
-    return this.listingRepository.save(listing);
+    // console.log(tasks);
+    // newListing.tasks = tasks;
+    console.log(await this.tasksService.findAll());
+    return newListing;
   }
 
-  findAll() {
-    return `This action returns all listings`;
+  async findAll(): Promise<Listing[]> {
+    return await this.listingRepository.find();
+    // return this.listingRepository.find({ where: { user: { id: userId }} });
   }
 
   async update(id: number, updateListingDto: UpdateListingDto) {
@@ -44,7 +53,7 @@ export class ListingsService {
 
     const tasks: Task[] = updateListingDto.tasks.map((task) => ({
       ...task,
-      listing: listing,
+      listing_id: listing.id,
     }));
 
     listing.tasks = tasks;
