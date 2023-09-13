@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Task {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'bigint' })
   id: number;
 
   @ManyToOne(() => Listing, (listing) => listing.tasks)

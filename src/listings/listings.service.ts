@@ -27,7 +27,7 @@ export class ListingsService {
         const task: Task = new Task();
 
         task.id = taskDto.id;
-        task.listing_id = taskDto.listing_id;
+        task.listing_id = newListing.id;
         task.description = taskDto.description;
         task.done = taskDto.done;
 
@@ -41,7 +41,12 @@ export class ListingsService {
   }
 
   async findAll(): Promise<Listing[]> {
-    return await this.listingRepository.find();
+    const listings = await this.listingRepository
+      .createQueryBuilder('listing')
+      .leftJoinAndSelect('listing.tasks', 'listing_id')
+      .getMany();
+
+    return listings;
     // return this.listingRepository.find({ where: { user: { id: userId }} });
   }
 
