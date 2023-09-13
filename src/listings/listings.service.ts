@@ -22,12 +22,20 @@ export class ListingsService {
 
     const newListing = await this.listingRepository.save(listing);
 
-    const newTasks: Task[] = createListingDto.tasks.map((task) => ({
-      ...task,
-      listing_id: newListing.id,
-    }));
+    const newTasks: Promise<Task>[] = createListingDto.tasks.map(
+      async (taskDto) => {
+        const task: Task = new Task();
 
-    newListing.tasks = await this.tasksService.createTasks(newTasks);
+        task.id = taskDto.id;
+        task.listing_id = taskDto.listing_id;
+        task.description = taskDto.description;
+        task.done = taskDto.done;
+
+        return await this.tasksService.create(task);
+      },
+    );
+
+    newListing.tasks = await Promise.all(newTasks);
 
     return newListing;
   }
@@ -41,7 +49,10 @@ export class ListingsService {
     return `This action returns a #${id} task`;
   }
 
-  async update(id: number, updateListingDto: UpdateListingDto) {
+  async update(
+    id: number,
+    updateListingDto: UpdateListingDto,
+  ): Promise<Listing> {
     const listing = await this.listingRepository.findOne({
       where: { id },
     });
@@ -52,12 +63,20 @@ export class ListingsService {
 
     listing.title = updateListingDto.title;
 
-    const tasks: Task[] = updateListingDto.tasks.map((task) => ({
-      ...task,
-      listing_id: listing.id,
-    }));
+    const tasks: Promise<Task>[] = updateListingDto.tasks.map(
+      async (taskDto) => {
+        const task: Task = new Task();
 
-    listing.tasks = tasks;
+        task.id = taskDto.id;
+        task.listing_id = taskDto.listing_id;
+        task.description = taskDto.description;
+        task.done = taskDto.done;
+
+        return await this.tasksService.update(task.id, task);
+      },
+    );
+
+    listing.tasks = await Promise.all(tasks);
 
     return await this.listingRepository.save(listing);
   }

@@ -23,21 +23,6 @@ export class TasksService {
     return await this.taskRepository.save(task);
   }
 
-  async createTasks(createTaskDto: CreateTaskDto[]): Promise<Task[]> {
-    const newTasks = createTaskDto.map(async (taskDto) => {
-      const task: Task = new Task();
-
-      task.id = taskDto.id;
-      task.listing_id = taskDto.listing_id;
-      task.description = taskDto.description;
-      task.done = taskDto.done;
-
-      return await this.taskRepository.save(task);
-    });
-
-    return await Promise.all(newTasks);
-  }
-
   async findAll(): Promise<Task[]> {
     return await this.taskRepository.find();
     // return this.taskRepository.find({ where: { user: { id: location_id }} });
