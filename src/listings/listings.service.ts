@@ -22,22 +22,23 @@ export class ListingsService {
 
     const newListing = await this.listingRepository.save(listing);
 
-    // const tasks = await createListingDto.tasks.map((task) => {
-    //   return this.taskRepository.save({
-    //     ...task,
-    //     listing_id: newListing.id,
-    //   });
-    // });
+    const newTasks: Task[] = createListingDto.tasks.map((task) => ({
+      ...task,
+      listing_id: newListing.id,
+    }));
 
-    // console.log(tasks);
-    // newListing.tasks = tasks;
-    console.log(await this.tasksService.findAll());
+    newListing.tasks = await this.tasksService.createTasks(newTasks);
+
     return newListing;
   }
 
   async findAll(): Promise<Listing[]> {
     return await this.listingRepository.find();
     // return this.listingRepository.find({ where: { user: { id: userId }} });
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} task`;
   }
 
   async update(id: number, updateListingDto: UpdateListingDto) {
