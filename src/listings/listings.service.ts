@@ -63,22 +63,27 @@ export class ListingsService {
 
     listing.title = updateListingDto.title;
 
-    const tasks: Promise<Task>[] = updateListingDto.tasks.map(
-      async (taskDto) => {
-        const task: Task = new Task();
+    const result = await this.listingRepository.update(id, listing);
 
-        task.id = taskDto.id;
-        task.listing_id = taskDto.listing_id;
-        task.description = taskDto.description;
-        task.done = taskDto.done;
+    if (result.affected < 1) {
+      throw new NotFoundException('Checklist não atualizada');
+    }
 
-        return await this.tasksService.update(task.id, task);
+    const tasks = await this.tasksService.findAll(id);
+
+    if (!tasks) {
+      throw new NotFoundException('Tarefa não encontrada');
+    }
+
+    const updatedTasks: Promise<Task>[] = updateListingDto.tasks.map(
+      async (taskItem) => {
+        return await this.tasksService.update(taskItem.id, taskItem);
       },
     );
 
-    listing.tasks = await Promise.all(tasks);
+    listing.tasks = await Promise.all(updatedTasks);
 
-    return await this.listingRepository.save(listing);
+    return listing;
   }
 
   async remove(id: number): Promise<boolean> {

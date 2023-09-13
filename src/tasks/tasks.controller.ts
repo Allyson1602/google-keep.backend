@@ -20,9 +20,9 @@ export class TasksController {
     return this.tasksService.create(createTaskDto);
   }
 
-  @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  @Get(':listing-id')
+  findAll(@Param('listing-id') listingId: number) {
+    return this.tasksService.findAll(listingId);
   }
 
   @Patch(':id')

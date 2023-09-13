@@ -23,14 +23,15 @@ export class TasksService {
     return await this.taskRepository.save(task);
   }
 
-  async findAll(): Promise<Task[]> {
-    return await this.taskRepository.find();
-    // return this.taskRepository.find({ where: { user: { id: location_id }} });
+  async findAll(listingId: number): Promise<Task[]> {
+    return this.taskRepository.find({
+      where: { listing_id: listingId },
+    });
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const task = await this.taskRepository.findOne({
-      where: { id },
+      where: { id, listing_id: updateTaskDto.listing_id },
     });
 
     if (!task) {
@@ -39,8 +40,15 @@ export class TasksService {
 
     task.description = updateTaskDto.description;
     task.done = updateTaskDto.done;
+    task.listing_id = updateTaskDto.listing_id;
 
-    return await this.taskRepository.save(task);
+    const result = await this.taskRepository.update(id, task);
+
+    if (result.affected < 1) {
+      throw new NotFoundException('Tarefa não atualizada');
+    }
+
+    return task;
   }
 
   async remove(id: number): Promise<boolean> {
