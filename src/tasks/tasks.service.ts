@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
@@ -38,19 +38,33 @@ export class TasksService {
     return await Promise.all(newTasks);
   }
 
-  findAll() {
-    return `This action returns all tasks`;
+  async findAll(): Promise<Task[]> {
+    return await this.taskRepository.find();
+    // return this.taskRepository.find({ where: { user: { id: location_id }} });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    const task = await this.taskRepository.findOne({
+      where: { id },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Tarefa não encontrada');
+    }
+
+    task.description = updateTaskDto.description;
+    task.done = updateTaskDto.done;
+
+    return await this.taskRepository.save(task);
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
-  }
+  async remove(id: number): Promise<boolean> {
+    const result = await this.taskRepository.delete(id);
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+    if (result.affected < 1) {
+      throw new NotFoundException('Tarefa não encontrada');
+    }
+
+    return result.affected >= 1 ? true : false;
   }
 }
