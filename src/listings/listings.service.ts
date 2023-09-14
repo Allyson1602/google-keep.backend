@@ -50,8 +50,8 @@ export class ListingsService {
     // return this.listingRepository.find({ where: { user: { id: userId }} });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(id: number): Promise<Listing> {
+    return await this.listingRepository.findOne({ where: { id } });
   }
 
   async update(
