@@ -9,8 +9,6 @@ export class Listing {
   @Column({ type: 'varchar', length: 60 })
   title: string;
 
-  @OneToMany(() => Task, (task) => task.listing_id, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => Task, (task) => task.listing_id)
   tasks: Task[];
 }

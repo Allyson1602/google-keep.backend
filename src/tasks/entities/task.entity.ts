@@ -6,7 +6,9 @@ export class Task {
   @PrimaryColumn({ type: 'bigint' })
   id: number;
 
-  @ManyToOne(() => Listing, (listing) => listing.tasks)
+  @ManyToOne(() => Listing, (listing) => listing.tasks, {
+    onDelete: 'CASCADE',
+  })
   listing_id: number;
 
   @Column({ type: 'varchar', length: 100 })

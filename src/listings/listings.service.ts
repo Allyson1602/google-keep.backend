@@ -44,7 +44,6 @@ export class ListingsService {
     const listings = await this.listingRepository
       .createQueryBuilder('listing')
       .leftJoinAndSelect('listing.tasks', 'listing_id')
-      .orderBy()
       .getMany();
 
     return listings;
