@@ -44,6 +44,7 @@ export class ListingsService {
     const listings = await this.listingRepository
       .createQueryBuilder('listing')
       .leftJoinAndSelect('listing.tasks', 'listing_id')
+      .orderBy()
       .getMany();
 
     return listings;
@@ -80,13 +81,7 @@ export class ListingsService {
       throw new NotFoundException('Tarefa não encontrada');
     }
 
-    const updatedTasks: Promise<Task>[] = updateListingDto.tasks.map(
-      async (taskItem) => {
-        return await this.tasksService.update(taskItem.id, taskItem);
-      },
-    );
-
-    listing.tasks = await Promise.all(updatedTasks);
+    listing.tasks = tasks;
 
     return listing;
   }

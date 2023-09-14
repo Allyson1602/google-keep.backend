@@ -28,6 +28,7 @@ export class TasksService {
       .createQueryBuilder('task')
       .where({ listing_id: listingId })
       .leftJoinAndSelect('task.listing_id', 'listing_id')
+      .orderBy()
       .getMany();
 
     return tasks;
