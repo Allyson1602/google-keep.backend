@@ -1,22 +1,24 @@
 import { Injectable } from '@nestjs/common';
-
-// This should be a real class/interface representing a user entity
-export type User = any;
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      userId: 1,
-      key: '111',
-    },
-    {
-      userId: 2,
-      key: '222',
-    },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user: User = new User();
+    user.key = createUserDto.key;
+
+    return await this.userRepository.save(user);
+  }
 
   async findOne(key: string): Promise<User | undefined> {
-    return this.users.find((user) => user.key === key);
+    return await this.userRepository.findOne({ where: { key } });
   }
 }

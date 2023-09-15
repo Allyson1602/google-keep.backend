@@ -47,7 +47,6 @@ export class ListingsService {
       .getMany();
 
     return listings;
-    // return this.listingRepository.find({ where: { user: { id: userId }} });
   }
 
   async findOne(id: number): Promise<Listing> {
