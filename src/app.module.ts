@@ -3,6 +3,7 @@ import { ListingsModule } from './listings/listings.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from './data-source';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     TypeOrmModule.forRoot(DataSource),
     ListingsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
