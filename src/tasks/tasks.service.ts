@@ -24,9 +24,13 @@ export class TasksService {
   }
 
   async findAll(listingId: number): Promise<Task[]> {
-    return this.taskRepository.find({
-      where: { listing_id: listingId },
-    });
+    const tasks = await this.taskRepository
+      .createQueryBuilder('task')
+      .where({ listing_id: listingId })
+      .leftJoinAndSelect('task.listing_id', 'listing_id')
+      .getMany();
+
+    return tasks;
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {

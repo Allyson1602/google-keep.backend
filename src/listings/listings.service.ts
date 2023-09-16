@@ -6,18 +6,28 @@ import { Listing } from './entities/listing.entity';
 import { Repository } from 'typeorm';
 import { Task } from 'src/tasks/entities/task.entity';
 import { TasksService } from 'src/tasks/tasks.service';
+import { Request } from 'express';
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ListingsService {
   constructor(
     @InjectRepository(Listing)
     private readonly listingRepository: Repository<Listing>,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
+    @Inject(UsersService)
+    private readonly userService: UsersService,
     @Inject(TasksService)
     private readonly tasksService: TasksService,
   ) {}
 
-  async create(createListingDto: CreateListingDto): Promise<Listing> {
-    const listing: Listing = new Listing();
+  async create(
+    request: Request,
+    createListingDto: CreateListingDto,
+  ): Promise<Listing | (Listing & { key?: string })> {
+    const listing: Listing & { key?: string } = new Listing();
     listing.title = createListingDto.title;
 
     const newListing = await this.listingRepository.save(listing);
@@ -27,7 +37,7 @@ export class ListingsService {
         const task: Task = new Task();
 
         task.id = taskDto.id;
-        task.listing_id = taskDto.listing_id;
+        task.listing_id = newListing.id;
         task.description = taskDto.description;
         task.done = taskDto.done;
 
@@ -37,16 +47,26 @@ export class ListingsService {
 
     newListing.tasks = await Promise.all(newTasks);
 
+    const AuthToken = request.headers.authorization;
+    if (!AuthToken) {
+      const user = await this.userService.create();
+      const authUser = await this.authService.signIn(user.id);
+
+      newListing.key = authUser.key;
+      newListing.user_id = authUser.id;
+    }
+
     return newListing;
   }
 
-  async findAll(): Promise<Listing[]> {
-    return await this.listingRepository.find();
-    // return this.listingRepository.find({ where: { user: { id: userId }} });
-  }
+  async findAll(id: number): Promise<Listing[]> {
+    const listings = await this.listingRepository
+      .createQueryBuilder('listing')
+      .leftJoinAndSelect('listing.tasks', 'listing_id')
+      .where({ id })
+      .getMany();
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+    return listings;
   }
 
   async update(
@@ -75,13 +95,7 @@ export class ListingsService {
       throw new NotFoundException('Tarefa não encontrada');
     }
 
-    const updatedTasks: Promise<Task>[] = updateListingDto.tasks.map(
-      async (taskItem) => {
-        return await this.tasksService.update(taskItem.id, taskItem);
-      },
-    );
-
-    listing.tasks = await Promise.all(updatedTasks);
+    listing.tasks = tasks;
 
     return listing;
   }
