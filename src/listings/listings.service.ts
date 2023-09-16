@@ -53,22 +53,20 @@ export class ListingsService {
       const authUser = await this.authService.signIn(user.id);
 
       newListing.key = authUser.key;
+      newListing.user_id = authUser.id;
     }
 
     return newListing;
   }
 
-  async findAll(): Promise<Listing[]> {
+  async findAll(id: number): Promise<Listing[]> {
     const listings = await this.listingRepository
       .createQueryBuilder('listing')
       .leftJoinAndSelect('listing.tasks', 'listing_id')
+      .where({ id })
       .getMany();
 
     return listings;
-  }
-
-  async findOne(id: number): Promise<Listing> {
-    return await this.listingRepository.findOne({ where: { id } });
   }
 
   async update(

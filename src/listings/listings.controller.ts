@@ -29,15 +29,9 @@ export class ListingsController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get()
-  findAll() {
-    return this.listingsService.findAll();
-  }
-
-  @HttpCode(HttpStatus.OK)
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.listingsService.findOne(id);
+  findAll(@Param('id', ParseIntPipe) id: number) {
+    return this.listingsService.findAll(id);
   }
 
   @HttpCode(HttpStatus.OK)
