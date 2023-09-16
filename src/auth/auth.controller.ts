@@ -9,6 +9,6 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   signIn(@Body() signInDto: CreateAuthDto) {
-    return this.authService.signIn(signInDto.key);
+    return this.authService.signIn(signInDto.userId);
   }
 }

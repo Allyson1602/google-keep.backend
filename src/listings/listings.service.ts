@@ -6,18 +6,28 @@ import { Listing } from './entities/listing.entity';
 import { Repository } from 'typeorm';
 import { Task } from 'src/tasks/entities/task.entity';
 import { TasksService } from 'src/tasks/tasks.service';
+import { Request } from 'express';
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ListingsService {
   constructor(
     @InjectRepository(Listing)
     private readonly listingRepository: Repository<Listing>,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
+    @Inject(UsersService)
+    private readonly userService: UsersService,
     @Inject(TasksService)
     private readonly tasksService: TasksService,
   ) {}
 
-  async create(createListingDto: CreateListingDto): Promise<Listing> {
-    const listing: Listing = new Listing();
+  async create(
+    request: Request,
+    createListingDto: CreateListingDto,
+  ): Promise<Listing | (Listing & { key?: string })> {
+    const listing: Listing & { key?: string } = new Listing();
     listing.title = createListingDto.title;
 
     const newListing = await this.listingRepository.save(listing);
@@ -36,6 +46,14 @@ export class ListingsService {
     );
 
     newListing.tasks = await Promise.all(newTasks);
+
+    const AuthToken = request.headers.authorization;
+    if (!AuthToken) {
+      const user = await this.userService.create();
+      const authUser = await this.authService.signIn(user.id);
+
+      newListing.key = authUser.key;
+    }
 
     return newListing;
   }

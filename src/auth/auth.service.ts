@@ -10,10 +10,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(key: string): Promise<Auth> {
-    const user = await this.usersService.findOne(key);
+  async signIn(userId: number): Promise<Auth> {
+    const user = await this.usersService.findOne(userId);
 
-    const payload = { sub: user.id, key: user.key };
+    const payload = { sub: user.id, key: user.id };
     return {
       id: user.id,
       key: await this.jwtService.signAsync(payload),

@@ -9,19 +9,23 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { ListingsService } from './listings.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
+import { Request } from 'express';
+import { Public } from 'src/auth/constants';
 
 @Controller('listings')
 export class ListingsController {
   constructor(private readonly listingsService: ListingsService) {}
 
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() createListingDto: CreateListingDto) {
-    return this.listingsService.create(createListingDto);
+  create(@Req() request: Request, @Body() createListingDto: CreateListingDto) {
+    return this.listingsService.create(request, createListingDto);
   }
 
   @HttpCode(HttpStatus.OK)
