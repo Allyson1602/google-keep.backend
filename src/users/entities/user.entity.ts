@@ -6,6 +6,6 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => Listing, (listing) => listing.user_id)
+  @OneToMany(() => Listing, (listing) => listing.user)
   listings: Listing[];
 }

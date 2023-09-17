@@ -1,18 +1,18 @@
 import {
   IsBoolean,
-  IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 export class CreateTaskDto {
   @IsNotEmpty()
-  @IsInt()
-  id: number;
+  @IsString()
+  id: string;
 
-  @IsInt()
-  listing_id: number;
+  @IsNumber()
+  listing: number;
 
   @IsOptional()
   @IsString()

@@ -28,6 +28,17 @@ export class ListingsService {
     createListingDto: CreateListingDto,
   ): Promise<Listing | (Listing & { key?: string })> {
     const listing: Listing & { key?: string } = new Listing();
+
+    const authToken = request.headers.authorization;
+    if (!authToken) {
+      const user = await this.userService.create();
+      const authUser = await this.authService.signIn(user.id);
+
+      listing.key = authUser.key;
+      listing.user = authUser.id;
+    }
+
+    listing.user = createListingDto.user;
     listing.title = createListingDto.title;
 
     const newListing = await this.listingRepository.save(listing);
@@ -37,7 +48,7 @@ export class ListingsService {
         const task: Task = new Task();
 
         task.id = taskDto.id;
-        task.listing_id = newListing.id;
+        task.listing = newListing.id;
         task.description = taskDto.description;
         task.done = taskDto.done;
 
@@ -47,23 +58,15 @@ export class ListingsService {
 
     newListing.tasks = await Promise.all(newTasks);
 
-    const AuthToken = request.headers.authorization;
-    if (!AuthToken) {
-      const user = await this.userService.create();
-      const authUser = await this.authService.signIn(user.id);
-
-      newListing.key = authUser.key;
-      newListing.user_id = authUser.id;
-    }
-
     return newListing;
   }
 
-  async findAll(id: number): Promise<Listing[]> {
+  async findAll(userId: number): Promise<Listing[]> {
     const listings = await this.listingRepository
       .createQueryBuilder('listing')
-      .leftJoinAndSelect('listing.tasks', 'listing_id')
-      .where({ id })
+      .leftJoinAndSelect('listing.tasks', 'task')
+      .leftJoinAndSelect('task.listing', 'listingId')
+      .where({ user: userId })
       .getMany();
 
     return listings;

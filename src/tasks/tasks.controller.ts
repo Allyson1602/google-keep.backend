@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -32,16 +31,13 @@ export class TasksController {
 
   @HttpCode(HttpStatus.OK)
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateTaskDto: UpdateTaskDto,
-  ) {
-    return this.tasksService.update(+id, updateTaskDto);
+  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+    return this.tasksService.update(id, updateTaskDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.tasksService.remove(+id);
+  remove(@Param('id') id: string) {
+    return this.tasksService.remove(id);
   }
 }

@@ -3,13 +3,13 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Task {
-  @PrimaryColumn({ type: 'bigint' })
-  id: number;
+  @PrimaryColumn({ type: 'uuid' })
+  id: string;
 
   @ManyToOne(() => Listing, (listing) => listing.tasks, {
     onDelete: 'CASCADE',
   })
-  listing_id: number;
+  listing: number;
 
   @Column({ type: 'varchar', length: 100 })
   description: string;

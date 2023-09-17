@@ -16,11 +16,11 @@ export class Listing {
   @ManyToOne(() => User, (user) => user.id, {
     onDelete: 'CASCADE',
   })
-  user_id: number;
+  user: number;
 
   @Column({ type: 'varchar', length: 60 })
   title: string;
 
-  @OneToMany(() => Task, (task) => task.listing_id)
+  @OneToMany(() => Task, (task) => task.listing)
   tasks: Task[];
 }

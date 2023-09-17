@@ -16,7 +16,7 @@ export class TasksService {
     const task: Task = new Task();
 
     task.id = createTaskDto.id;
-    task.listing_id = createTaskDto.listing_id;
+    task.listing = createTaskDto.listing;
     task.description = createTaskDto.description;
     task.done = createTaskDto.done;
 
@@ -26,16 +26,16 @@ export class TasksService {
   async findAll(listingId: number): Promise<Task[]> {
     const tasks = await this.taskRepository
       .createQueryBuilder('task')
-      .where({ listing_id: listingId })
-      .leftJoinAndSelect('task.listing_id', 'listing_id')
+      .where({ listing: listingId })
+      .leftJoinAndSelect('task.listing', 'listing')
       .getMany();
 
     return tasks;
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const task = await this.taskRepository.findOne({
-      where: { id, listing_id: updateTaskDto.listing_id },
+      where: { id, listing: updateTaskDto.listing },
     });
 
     if (!task) {
@@ -44,7 +44,7 @@ export class TasksService {
 
     task.description = updateTaskDto.description;
     task.done = updateTaskDto.done;
-    task.listing_id = updateTaskDto.listing_id;
+    task.listing = updateTaskDto.listing;
 
     const result = await this.taskRepository.update(id, task);
 
@@ -55,7 +55,7 @@ export class TasksService {
     return task;
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(id: string): Promise<boolean> {
     const result = await this.taskRepository.delete(id);
 
     if (result.affected < 1) {
