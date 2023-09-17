@@ -36,9 +36,10 @@ export class ListingsService {
 
       listing.key = authUser.key;
       listing.user = authUser.id;
+    } else {
+      listing.user = createListingDto.user;
     }
 
-    listing.user = createListingDto.user;
     listing.title = createListingDto.title;
 
     const newListing = await this.listingRepository.save(listing);
