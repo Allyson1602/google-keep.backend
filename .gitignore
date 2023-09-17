@@ -2,6 +2,14 @@
 /dist
 /node_modules
 
+# virtual environment
+.env
+.env.local
+.env.*
+.env.local.*
+.env/
+.env.example
+
 # Logs
 logs
 *.log
